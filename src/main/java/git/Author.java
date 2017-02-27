@@ -7,8 +7,8 @@ import org.eclipse.jgit.lib.PersonIdent;
  * @date 27.02.17
  */
 public class Author {
-    private String name;
-    private String mail;
+    private final String name;
+    private final String mail;
 
     public Author(String name, String emailAddress) {
         this.name = name;
