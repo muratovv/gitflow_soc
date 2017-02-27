@@ -1,10 +1,8 @@
 package git;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static util.Require.require;
 
@@ -60,25 +58,25 @@ public class FileChange {
     }
 
     private static InsertionDeletionPair parseRaw(String raw) {
-        String[] split = raw.split("\n");
+        List<String> split = new ArrayList<>(Arrays.asList(raw.split("\n")));
         split = removeFirstFourLines(split);
         split = removeAtStartsLines(split);
         return countModifications(split);
     }
 
-    private static String[] removeFirstFourLines(String[] split) {
-        return Arrays.copyOfRange(split, 3, split.length);
+    private static List<String> removeFirstFourLines(List<String> split) {
+        return split.stream().skip(4).collect(Collectors.toList());
     }
 
-    private static String[] removeAtStartsLines(String[] split) {
+    private static List<String> removeAtStartsLines(List<String> split) {
         ArrayList<String> result = new ArrayList<>();
         for (String s : split) {
             if (!s.startsWith("@@")) result.add(s);
         }
-        return (String[]) result.toArray();
+        return result;
     }
 
-    private static InsertionDeletionPair countModifications(String[] split) {
+    private static InsertionDeletionPair countModifications(List<String> split) {
         long inserts = 0;
         long deletes = 0;
         for (String s : split) {
