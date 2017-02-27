@@ -1,0 +1,15 @@
+## Idea files
+.idea/
+libs/
+
+## gradle
+.gradle
+build/
+
+## File-based project format:
+*.iws
+*.iml
+*.ipr
+
+## ignore inside repo
+test_repo
