@@ -9,6 +9,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import static util.Require.require;
+
 /**
  * @author @muratovv
  * @date 27.02.17
@@ -61,8 +63,19 @@ public class Differ {
         return raw;
     }
 
-    public List<DiffEntry> makeDiff(RevCommit current, RevCommit old) throws IOException {
-        List<DiffEntry> scanned = formatter.scan(old, current);
+    /**
+     * Retrieve differences from two near commits
+     *
+     * @param current commit for retrieve
+     * @param prev    previous commit
+     *
+     * @return list of differences
+     *
+     * @throws IOException
+     */
+    public List<DiffEntry> makeDiff(RevCommit current, RevCommit prev) throws IOException {
+        require(() -> current.getParent(0).equals(prev), "Commits must be in strong order: current <= prev");
+        List<DiffEntry> scanned = formatter.scan(prev, current);
         return scanned;
     }
 
