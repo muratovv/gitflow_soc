@@ -1,5 +1,6 @@
 package git;
 
+import com.google.common.base.MoreObjects;
 import org.eclipse.jgit.lib.PersonIdent;
 
 /**
@@ -32,5 +33,14 @@ public class Author {
 
     public String mail() {
         return mail;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects
+                .toStringHelper(this)
+                .add("name", name)
+                .add("mail", mail)
+                .toString();
     }
 }

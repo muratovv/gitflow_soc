@@ -1,5 +1,7 @@
 package git;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.revwalk.RevCommit;
 
@@ -80,5 +82,14 @@ public class Commit implements Comparable<Commit> {
     public int compareTo(Commit right) {
         return this.timeOfCommit.compareTo(
                 right.timeOfCommit);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("author", author)
+                .add("timeOfCommit", timeOfCommit)
+                .add("changes", Joiner.on(',').join(changes))
+                .toString();
     }
 }

@@ -1,5 +1,8 @@
 package git;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -104,6 +107,15 @@ public class FileChange {
         return deletions;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("aliases", Joiner.on(',').join(aliases.values()))
+                .add("insertions", insertions)
+                .add("deletions", deletions)
+                .toString();
+    }
+
     private static class InsertionDeletionPair {
         private long inserts;
         private long deletes;
@@ -113,5 +125,4 @@ public class FileChange {
             this.deletes = deletes;
         }
     }
-
 }
