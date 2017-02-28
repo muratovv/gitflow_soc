@@ -55,9 +55,9 @@ public class Commit implements Comparable<Commit> {
     private static Collection<FileChange> retrieveChanges(RevCommit current, RevCommit old) throws IOException {
         ArrayList<FileChange> result = new ArrayList<>();
 
-        List<DiffEntry> diffEntries = Differ.singletone().makeDiff(current, old);
+        List<DiffEntry> diffEntries = Differ.singleton().makeDiff(current, old);
         for (DiffEntry entry : diffEntries) {
-            String raw = Differ.singletone().rawDiffFile(entry);
+            String raw = Differ.singleton().getRawDiffEntry(entry);
 
             FileChange fileDiff = FileChange.parseDiff(entry.getNewPath(), raw);
             if (entry.getChangeType() == DiffEntry.ChangeType.RENAME) {

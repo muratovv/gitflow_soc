@@ -29,7 +29,7 @@ public class Differ {
     /**
      * @return {@link Differ} singleton instance
      */
-    public static Differ singletone() {
+    public static Differ singleton() {
         if (differ == null)
             throw new NullPointerException("differ is null");
         return differ;
@@ -44,7 +44,16 @@ public class Differ {
         differ = new Differ(repository);
     }
 
-    public String rawDiffFile(DiffEntry entry) throws IOException {
+    /**
+     * Get string representation of {@link DiffEntry} object
+     *
+     * @param entry source object
+     *
+     * @return string representation
+     *
+     * @throws IOException
+     */
+    public String getRawDiffEntry(DiffEntry entry) throws IOException {
         stream.reset();
         formatter.format(entry);
         String raw = stream.toString();
