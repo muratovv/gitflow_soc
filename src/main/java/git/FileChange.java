@@ -2,6 +2,7 @@ package git;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
+import org.eclipse.jgit.diff.DiffEntry;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,18 +20,23 @@ public class FileChange {
     /**
      * Aliases is name of file with renaming
      */
-    private Set<String> aliases    = new HashSet<>();
+    private Set<String> aliases = new HashSet<>();
+    /**
+     * Type of changing file, such as modification, deletion, and so on
+     */
+    private DiffEntry.ChangeType changeType;
     /**
      * Number of insertions on one change
      */
-    private long        insertions = 0;
+    private long insertions = 0;
     /**
      * Number of deletions on one change
      */
-    private long        deletions  = 0;
+    private long deletions  = 0;
 
-    public FileChange(String name, long insertions, long deletions) {
+    public FileChange(String name, DiffEntry.ChangeType type, long insertions, long deletions) {
         setAlias(name);
+        this.changeType = type;
         require(() -> insertions >= 0, "Insertions must be non negative");
         require(() -> deletions >= 0, "Deletions must be non negative");
         this.insertions = insertions;
@@ -54,9 +60,9 @@ public class FileChange {
      *
      * @return constructed {@link FileChange}
      */
-    public static FileChange parseDiff(String name, String rawDiff) {
+    public static FileChange parseDiff(String name, DiffEntry.ChangeType type, String rawDiff) {
         InsertionDeletionPair numbers = parseRaw(rawDiff);
-        return new FileChange(name, numbers.inserts, numbers.deletes);
+        return new FileChange(name, type, numbers.inserts, numbers.deletes);
     }
 
     private static InsertionDeletionPair parseRaw(String raw) {
@@ -109,6 +115,8 @@ public class FileChange {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
+                .omitNullValues()
+                .addValue(String.format("[%s]", changeType))
                 .add("aliases", Joiner.on(',').join(aliases))
                 .add("+", insertions)
                 .add("-", deletions)

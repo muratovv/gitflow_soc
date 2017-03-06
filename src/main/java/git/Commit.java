@@ -61,7 +61,7 @@ public class Commit implements Comparable<Commit> {
         for (DiffEntry entry : diffEntries) {
             String raw = Differ.singleton().getRawDiffEntry(entry);
 
-            FileChange fileDiff = FileChange.parseDiff(entry.getNewPath(), raw);
+            FileChange fileDiff = FileChange.parseDiff(entry.getNewPath(), entry.getChangeType(), raw);
             if (entry.getChangeType() == DiffEntry.ChangeType.RENAME) {
                 fileDiff.setAlias(entry.getOldPath());
             }
@@ -87,6 +87,7 @@ public class Commit implements Comparable<Commit> {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
+                .omitNullValues()
                 .add("author", author.name())
                 .add("timeOfCommit", timeOfCommit)
                 .addValue(Joiner.on(',').join(changes))

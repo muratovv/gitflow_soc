@@ -1,5 +1,6 @@
 package git;
 
+import org.eclipse.jgit.diff.DiffEntry;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -36,7 +37,7 @@ public class FileChangeTest {
                 "+http://uSUoenybuF.ru";
 
         String     FILE_NAME = "test";
-        FileChange changes   = FileChange.parseDiff(FILE_NAME, rawInput);
+        FileChange changes   = FileChange.parseDiff(FILE_NAME, DiffEntry.ChangeType.ADD, rawInput);
         assertTrue(changes.aliases().contains(FILE_NAME));
         assertEquals(changes.insertions(), 6);
         assertEquals(changes.deletions(), 10);
