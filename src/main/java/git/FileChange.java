@@ -110,8 +110,8 @@ public class FileChange {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("aliases", Joiner.on(',').join(aliases))
-                .add("insertions", insertions)
-                .add("deletions", deletions)
+                .add("+", insertions)
+                .add("-", deletions)
                 .toString();
     }
 
