@@ -87,9 +87,9 @@ public class Commit implements Comparable<Commit> {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("author", author)
+                .addValue(author)
                 .add("timeOfCommit", timeOfCommit)
-                .add("changes", Joiner.on(',').join(changes))
+                .addValue(Joiner.on(',').join(changes))
                 .toString();
     }
 }
