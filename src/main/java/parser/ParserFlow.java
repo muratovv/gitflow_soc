@@ -22,6 +22,11 @@ import java.util.stream.Collectors;
  */
 public class ParserFlow {
 
+    /**
+     * Init module for start working
+     *
+     * @throws GitAPIException
+     */
     public static void init(Git git) throws GitAPIException {
         Differ.init(git.getRepository());
     }
