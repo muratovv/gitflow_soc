@@ -2,6 +2,7 @@ package git;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
+import javafx.util.Pair;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.revwalk.RevCommit;
 
@@ -59,16 +60,50 @@ public class Commit implements Comparable<Commit> {
 
         List<DiffEntry> diffEntries = Differ.singleton().makeDiff(current, old);
         for (DiffEntry entry : diffEntries) {
-            String raw = Differ.singleton().getRawDiffEntry(entry);
+            String               raw   = Differ.singleton().getRawDiffEntry(entry);
+            Pair<String, String> names = getFileNames(entry);
 
-            FileChange fileDiff = FileChange.parseDiff(entry.getNewPath(), entry.getChangeType(), raw);
-            if (entry.getChangeType() == DiffEntry.ChangeType.RENAME) {
-                fileDiff.setAlias(entry.getOldPath());
+            FileChange fileDiff = FileChange.parseDiff(names.getValue(), entry.getChangeType(), raw);
+
+            if (names.getKey() != null) {
+                fileDiff.setAlias(names.getKey());
             }
             result.add(fileDiff);
         }
 
         return result;
+    }
+
+    /**
+     * Retrieve information about path of file
+     *
+     * @param entry target object for retrieve path
+     *
+     * @return (old_path, new_path); also old_path may be null
+     */
+    private static Pair<String, String> getFileNames(DiffEntry entry) {
+        String               newName    = null;
+        String               oldName    = null;
+        DiffEntry.ChangeType changeType = entry.getChangeType();
+        switch (changeType) {
+            case ADD:
+                newName = entry.getNewPath();
+                break;
+            case MODIFY:
+                newName = entry.getNewPath();
+                break;
+            case DELETE:
+                newName = entry.getOldPath();
+                break;
+            case RENAME:
+                newName = entry.getNewPath();
+                oldName = entry.getOldPath();
+                break;
+            case COPY:
+                newName = entry.getNewPath();
+                break;
+        }
+        return new Pair<>(oldName, newName);
     }
 
     /**
