@@ -114,13 +114,17 @@ public class FileChange {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
+        MoreObjects.ToStringHelper aliases = MoreObjects.toStringHelper("Diff")
                 .omitNullValues()
-                .addValue(String.format("[%s]", changeType))
-                .add("aliases", Joiner.on(',').join(aliases))
-                .add("+", insertions)
-                .add("-", deletions)
-                .toString();
+                .addValue(String.format("[%s]", changeType.toString().substring(0, 3)))
+                .add("aliases", Joiner.on(',').join(this.aliases));
+
+        if (insertions > 0)
+            aliases.add("+", insertions);
+        if (deletions > 0)
+            aliases.add("-", deletions);
+
+        return aliases.toString();
     }
 
     private static class InsertionDeletionPair {

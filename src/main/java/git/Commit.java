@@ -123,8 +123,10 @@ public class Commit implements Comparable<Commit> {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .omitNullValues()
-                .add("author", author.name())
-                .add("timeOfCommit", timeOfCommit)
+                .add("author", "\"".concat(
+                        author.name())
+                        .concat("\""))
+                .add("time", timeOfCommit)
                 .addValue(Joiner.on(',').join(changes))
                 .toString();
     }
