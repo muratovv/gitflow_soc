@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static util.Require.require;
@@ -20,15 +19,15 @@ public class FileChange {
     /**
      * Aliases is name of file with renaming
      */
-    private Map<String, String> aliases    = new ConcurrentHashMap<>();
+    private Set<String> aliases    = new HashSet<>();
     /**
      * Number of insertions on one change
      */
-    private long                insertions = 0;
+    private long        insertions = 0;
     /**
      * Number of deletions on one change
      */
-    private long                deletions  = 0;
+    private long        deletions  = 0;
 
     public FileChange(String name, long insertions, long deletions) {
         setAlias(name);
@@ -44,7 +43,7 @@ public class FileChange {
      * @param alias new name of file
      */
     public void setAlias(String alias) {
-        aliases.putIfAbsent(alias, alias);
+        aliases.add(alias);
     }
 
     /**
@@ -96,7 +95,7 @@ public class FileChange {
     }
 
     public Collection<String> aliases() {
-        return aliases.values();
+        return aliases;
     }
 
     public long insertions() {
@@ -110,7 +109,7 @@ public class FileChange {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("aliases", Joiner.on(',').join(aliases.values()))
+                .add("aliases", Joiner.on(',').join(aliases))
                 .add("insertions", insertions)
                 .add("deletions", deletions)
                 .toString();
