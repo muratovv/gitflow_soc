@@ -6,7 +6,7 @@ import org.eclipse.jgit.api.Git;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author @muratovv
@@ -17,8 +17,7 @@ public class ParserFlowTest {
     public void getCommits() throws Exception {
         Git git = Git.open(new File("test_repo"));
         ParserFlow.init(git);
-        ArrayList<Commit> commits = ParserFlow.getCommits(git);
+        List<Commit> commits = ParserFlow.getCommits(git);
         System.out.println(Joiner.on('\n').join(commits));
-
     }
 }

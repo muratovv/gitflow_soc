@@ -41,10 +41,10 @@ public class ParserFlow {
      *
      * @throws GitAPIException
      */
-    public static ArrayList<Commit> getCommits(Git git) throws GitAPIException {
+    public static List<Commit> getCommits(Git git) throws GitAPIException {
         List<RevCommit>                  revCommits      = retrieveRevisions(git);
         List<Pair<RevCommit, RevCommit>> revisionsByPair = Lists.zipOverlappedPairs(revCommits);
-        ArrayList<Commit> commits = revisionsByPair.stream().map(p -> {
+        return revisionsByPair.stream().map(p -> {
             try {
                 return Commit.parse(p.getKey(), p.getValue());
             } catch (IOException e) {
@@ -52,7 +52,6 @@ public class ParserFlow {
                 return null;
             }
         }).collect(Collectors.toCollection(ArrayList::new));
-        return commits;
     }
 
     /**
