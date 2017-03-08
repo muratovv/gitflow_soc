@@ -15,15 +15,25 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * Class represents one commit in repository
  * @author @muratovv
  * @date 27.02.17
  */
 public class Commit implements Comparable<Commit> {
+    /**
+     * Author of commit
+     */
     private Author                 author;
+    /**
+     * Changes happen in commit
+     */
     private Collection<FileChange> changes;
+    /**
+     * Time of commit
+     */
     private LocalDateTime          timeOfCommit;
 
-    public Commit(Author author, LocalDateTime timeOfCommit, Collection<FileChange> changes) {
+    private Commit(Author author, LocalDateTime timeOfCommit, Collection<FileChange> changes) {
         this.author = author;
         this.timeOfCommit = timeOfCommit;
         this.changes = changes;
