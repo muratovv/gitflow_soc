@@ -25,8 +25,12 @@ public class GitFlowInfo {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
+        return MoreObjects.toStringHelper("flow")
                 .add("message", message)
                 .toString();
+    }
+
+    public String message() {
+        return message;
     }
 }
