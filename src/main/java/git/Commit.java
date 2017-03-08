@@ -14,8 +14,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static util.Strings.wrapWithQuotes;
+
 /**
  * Class represents one commit in repository
+ *
  * @author @muratovv
  * @date 27.02.17
  */
@@ -155,11 +158,11 @@ public class Commit implements Comparable<Commit> {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .omitNullValues()
-                .add("author", "\"".concat(
-                        author.name())
-                        .concat("\""))
+                .add("author", wrapWithQuotes(author.name()))
                 .add("time", timeOfCommit)
+                .add("msg", wrapWithQuotes(info.message()))
                 .addValue(Joiner.on(',').join(changes))
                 .toString();
     }
+
 }
