@@ -33,10 +33,16 @@ public class Commit implements Comparable<Commit> {
      */
     private LocalDateTime          timeOfCommit;
 
-    private Commit(Author author, LocalDateTime timeOfCommit, Collection<FileChange> changes) {
+    /**
+     * Gitflow information related to commit
+     */
+    private GitFlowInfo info;
+
+    private Commit(Author author, LocalDateTime timeOfCommit, Collection<FileChange> changes, GitFlowInfo info) {
         this.author = author;
         this.timeOfCommit = timeOfCommit;
         this.changes = changes;
+        this.info = info;
     }
 
     /**
@@ -53,7 +59,7 @@ public class Commit implements Comparable<Commit> {
         Author                 author  = Author.parse(current.getAuthorIdent());
         LocalDateTime          time    = retrieveTimeOfCommit(current);
         Collection<FileChange> changes = retrieveChanges(current, old);
-        return new Commit(author, time, changes);
+        return new Commit(author, time, changes, GitFlowInfo.parse(current.getFullMessage()));
     }
 
     /**
@@ -127,6 +133,22 @@ public class Commit implements Comparable<Commit> {
     public int compareTo(Commit right) {
         return this.timeOfCommit.compareTo(
                 right.timeOfCommit);
+    }
+
+    public Author author() {
+        return author;
+    }
+
+    public Collection<FileChange> changes() {
+        return changes;
+    }
+
+    public LocalDateTime timeOfCommit() {
+        return timeOfCommit;
+    }
+
+    public GitFlowInfo info() {
+        return info;
     }
 
     @Override
