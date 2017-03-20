@@ -1,46 +1,31 @@
 package parser;
 
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
-import org.kohsuke.args4j.OptionDef;
-import org.kohsuke.args4j.spi.OneArgumentOptionHandler;
-import org.kohsuke.args4j.spi.Setter;
+import com.google.common.base.Joiner;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import git.Commit;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @author @muratovv
  * @date 20.02.17
  */
 public class Main {
-    public static void main(String[] args) {
-        InputParameters p      = new InputParameters();
-        CmdLineParser   parser = new CmdLineParser(p);
-        System.out.println("target repo: " + p.targetRepository);
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Main.class);
+
+    public static void main(String[] args) throws IOException, GitAPIException {
+        final Config config         = ConfigFactory.load("run.conf");
+        String       repositoryPath = config.getString("root.repo_path");
+        logger.info("Target repo: {}", repositoryPath);
+        Git git = Git.open(new File(repositoryPath));
+        ParserFlow.init(git);
+        List<Commit> commits = ParserFlow.getCommits(git);
+        logger.info(Joiner.on('\n').join(commits));
     }
 
-    private static class InputParameters {
-        @Option(name = "target", required = true, handler = RepoHelper.class)
-        private File targetRepository;
-    }
-
-    /**
-     * Helper class for parsing repository
-     */
-    private static class RepoHelper extends OneArgumentOptionHandler<File> {
-
-        public RepoHelper(CmdLineParser parser, OptionDef option, Setter<? super File> setter) {
-            super(parser, option, setter);
-        }
-
-        @Override
-        protected File parse(String argument) throws NumberFormatException, CmdLineException {
-            File f = new File(argument);
-            if (!f.isDirectory()) new CmdLineException(owner, "Repository must be folder");
-            if (f.list((dir, name) -> ".git".equals(name)).length == 0)
-                new CmdLineException(super.owner, "Folder must contains .git folder");
-            return f;
-        }
-    }
 }
