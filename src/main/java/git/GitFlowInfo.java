@@ -13,13 +13,16 @@ import java.util.Map;
  */
 public class GitFlowInfo {
 
-    public static Map<CommitType, String> prefixes = new HashMap<CommitType, String>() {
-        private Map<CommitType, String> inflateDefault() {
-            put(CommitType.RELEASE, "release/");
-            put(CommitType.HOTFIX, "hotfix/");
-            put(CommitType.FEATURE, "feature/");
-            put(CommitType.BUGFIX, "bugfix/");
-            put(CommitType.SUPPORT, "support/");
+    /**
+     * Default prefixes for finding
+     */
+    public static Map<String, CommitType> prefixes = new HashMap<String, CommitType>() {
+        private Map<String, CommitType> inflateDefault() {
+            put("release/", CommitType.RELEASE);
+            put("hotfix/", CommitType.HOTFIX);
+            put("feature/", CommitType.FEATURE);
+            put("bugfix/", CommitType.BUGFIX);
+            put("support/", CommitType.SUPPORT);
             return this;
         }
     }.inflateDefault();
@@ -42,11 +45,31 @@ public class GitFlowInfo {
 
     public static GitFlowInfo parse(String commitMessage) {
 
-        return new GitFlowInfo(commitMessage);
+        try {
+            return new GitFlowInfo(commitMessage);
+        } catch (NotFoundGitflowException ex) {
+            return null;
+        }
     }
 
     private void parseMessage() {
+        for (String s : prefixes.keySet()) {
+            if (message.contains(s)) {
+                type = prefixes.get(s);
+                name = getName();
+                if (name == null) throw new NotFoundGitflowException();
+            }
+        }
+        throw new NotFoundGitflowException();
+    }
 
+    private String getName() {
+        try {
+            String[] split = message.split("/")[1].split("\'");
+            return split[1];
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     @Override
@@ -66,5 +89,9 @@ public class GitFlowInfo {
         FEATURE,
         BUGFIX,
         SUPPORT
+    }
+
+    public static class NotFoundGitflowException extends RuntimeException {
+
     }
 }
