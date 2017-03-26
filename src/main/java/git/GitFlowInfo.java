@@ -41,6 +41,7 @@ public class GitFlowInfo {
 
     private GitFlowInfo(String commitMessage) {
         this.message = commitMessage;
+        parseMessage();
     }
 
     public static GitFlowInfo parse(String commitMessage) {
@@ -58,6 +59,7 @@ public class GitFlowInfo {
                 type = prefixes.get(s);
                 name = getName();
                 if (name == null) throw new NotFoundGitflowException();
+                return;
             }
         }
         throw new NotFoundGitflowException();
@@ -66,7 +68,7 @@ public class GitFlowInfo {
     private String getName() {
         try {
             String[] split = message.split("/")[1].split("\'");
-            return split[1];
+            return split[0].trim();
         } catch (Exception ignored) {
         }
         return null;
@@ -75,7 +77,9 @@ public class GitFlowInfo {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper("flow")
-                .add("message", message)
+                .omitNullValues()
+                .add("type", type)
+                .add("name", name)
                 .toString();
     }
 

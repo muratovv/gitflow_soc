@@ -41,11 +41,18 @@ public class Commit implements Comparable<Commit> {
      */
     private GitFlowInfo info;
 
-    private Commit(Author author, LocalDateTime timeOfCommit, Collection<FileChange> changes, GitFlowInfo info) {
+
+    /**
+     * Commit message
+     */
+    private String message;
+
+    private Commit(Author author, LocalDateTime timeOfCommit, Collection<FileChange> changes, String message, GitFlowInfo info) {
         this.author = author;
         this.timeOfCommit = timeOfCommit;
         this.changes = changes;
         this.info = info;
+        this.message = message;
     }
 
     /**
@@ -59,10 +66,11 @@ public class Commit implements Comparable<Commit> {
      * @return filled {@link Commit} structure
      */
     public static Commit parse(RevCommit current, RevCommit old) throws IOException {
-        Author                 author  = Author.parse(current.getAuthorIdent());
-        LocalDateTime          time    = retrieveTimeOfCommit(current);
-        Collection<FileChange> changes = retrieveChanges(current, old);
-        return new Commit(author, time, changes, GitFlowInfo.parse(current.getFullMessage()));
+        Author                 author        = Author.parse(current.getAuthorIdent());
+        LocalDateTime          time          = retrieveTimeOfCommit(current);
+        Collection<FileChange> changes       = retrieveChanges(current, old);
+        String                 commitMessage = current.getFullMessage();
+        return new Commit(author, time, changes, commitMessage, GitFlowInfo.parse(commitMessage));
     }
 
     /**
@@ -160,8 +168,8 @@ public class Commit implements Comparable<Commit> {
                 .omitNullValues()
                 .add("author", wrapWithQuotes(author.name()))
                 .add("time", timeOfCommit)
-                .add("msg", wrapWithQuotes(info.message()))
-                .add("flow", info)
+                .add("msg", wrapWithQuotes(message))
+                .addValue(info)
                 .addValue(Joiner.on(',').join(changes))
                 .toString();
     }
