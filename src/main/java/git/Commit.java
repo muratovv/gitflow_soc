@@ -161,8 +161,8 @@ public class Commit implements Comparable<Commit> {
                 .add("author", wrapWithQuotes(author.name()))
                 .add("time", timeOfCommit)
                 .add("msg", wrapWithQuotes(info.message()))
+                .add("flow", info)
                 .addValue(Joiner.on(',').join(changes))
                 .toString();
     }
-
 }
