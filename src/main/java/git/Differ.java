@@ -74,7 +74,9 @@ public class Differ {
      * @throws IOException
      */
     public List<DiffEntry> makeDiff(RevCommit current, RevCommit prev) throws IOException {
-        require(() -> current.getParent(0).equals(prev), "Commits must be in strong order: current <= prev");
+        require(() -> current.getAuthorIdent().getWhen().after(prev.getAuthorIdent().getWhen()),
+                String.format("Commits must be in strong order: current(%s) <= prev(%s)",
+                        current.getFullMessage(), prev.getFullMessage()));
         List<DiffEntry> scanned = formatter.scan(prev, current);
         return scanned;
     }
