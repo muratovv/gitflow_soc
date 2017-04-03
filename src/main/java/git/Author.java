@@ -1,6 +1,7 @@
 package git;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import org.eclipse.jgit.lib.PersonIdent;
 
 /**
@@ -42,5 +43,19 @@ public class Author {
                 .add("name", name)
                 .add("mail", mail)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Author)) return false;
+        Author author = (Author) o;
+        return Objects.equal(name, author.name) &&
+                Objects.equal(mail, author.mail);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name, mail);
     }
 }
