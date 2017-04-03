@@ -6,7 +6,7 @@ import javafx.util.Pair;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
-import util.Lists;
+import util.ListsTransforms;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class ParserFlow {
      */
     public static List<Commit> getCommits(Git git) throws GitAPIException {
         List<RevCommit>                  revCommits      = retrieveRevisions(git);
-        List<Pair<RevCommit, RevCommit>> revisionsByPair = Lists.zipOverlappedPairs(revCommits);
+        List<Pair<RevCommit, RevCommit>> revisionsByPair = ListsTransforms.zipOverlappedPairs(revCommits);
         return revisionsByPair.stream().map(p -> {
             try {
                 return Commit.parse(p.getKey(), p.getValue());

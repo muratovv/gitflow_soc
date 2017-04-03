@@ -19,10 +19,12 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile group: 'com.google.guava', name: 'guava', version: '21.0'
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '2.2.0.201212191850-r'
-//    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.8.1'
-//    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.1'
     compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.6.1'
     compile group: 'com.typesafe', name: 'config', version: '1.3.1' // hocon config
+
+    // eclipse collections
+    compile 'org.eclipse.collections:eclipse-collections-api:8.1.0'
+    compile 'org.eclipse.collections:eclipse-collections:8.1.0'
 }
 
 
