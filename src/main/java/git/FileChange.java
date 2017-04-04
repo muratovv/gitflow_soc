@@ -49,9 +49,9 @@ public class FileChange {
     }
 
     /**
-     * Private constructor for {@link FileChange#collapse(FileChange, FileChange)} method
+     * Protected constructor for {@link FileChange#collapse(FileChange, FileChange)} method
      */
-    private FileChange(MutableSet<String> aliases, long insertions, long deletions) {
+    protected FileChange(MutableSet<String> aliases, long insertions, long deletions) {
         this.aliases = aliases;
         this.changeType = DiffEntry.ChangeType.MODIFY;
         require(() -> insertions >= 0, "Insertions must be non negative");
@@ -64,16 +64,18 @@ public class FileChange {
     /**
      * Merge collection of {@link FileChange}
      */
-    public static FileChange collapse(Iterable<FileChange> changes) {
+    public static CollapsedFileChange collapse(Iterable<FileChange> changes) {
         MutableSet<String> aliases    = Sets.mutable.empty();
         int                insertions = 0;
         int                deletions  = 0;
+        int                commits    = 0;
         for (FileChange change : changes) {
             aliases = aliases.union(change.aliases);
             insertions += change.insertions;
             deletions += change.deletions;
+            commits++;
         }
-        return new FileChange(aliases, insertions, deletions);
+        return new CollapsedFileChange(aliases, insertions, deletions, commits);
     }
 
     /**
