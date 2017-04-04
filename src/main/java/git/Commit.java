@@ -47,7 +47,8 @@ public class Commit implements Comparable<Commit> {
      */
     private String message;
 
-    private Commit(Author author, LocalDateTime timeOfCommit, Collection<FileChange> changes, String message, GitFlowInfo info) {
+    private Commit(Author author, LocalDateTime timeOfCommit, Collection<FileChange> changes,
+                   String message, GitFlowInfo info) {
         this.author = author;
         this.timeOfCommit = timeOfCommit;
         this.changes = changes;
