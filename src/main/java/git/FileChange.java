@@ -2,9 +2,14 @@ package git;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
+import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.jgit.diff.DiffEntry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static util.Require.require;
@@ -20,7 +25,7 @@ public class FileChange {
     /**
      * Aliases is name of file with renaming
      */
-    private Set<String> aliases = new HashSet<>();
+    private MutableSet<String> aliases = Sets.mutable.empty();
     /**
      * Type of changing file, such as modification, deletion, and so on
      */
@@ -41,6 +46,34 @@ public class FileChange {
         require(() -> deletions >= 0, "Deletions must be non negative");
         this.insertions = insertions;
         this.deletions = deletions;
+    }
+
+    /**
+     * Private constructor for {@link FileChange#collapse(FileChange, FileChange)} method
+     */
+    private FileChange(MutableSet<String> aliases, long insertions, long deletions) {
+        this.aliases = aliases;
+        this.changeType = DiffEntry.ChangeType.MODIFY;
+        require(() -> insertions >= 0, "Insertions must be non negative");
+        require(() -> deletions >= 0, "Deletions must be non negative");
+        this.insertions = insertions;
+        this.deletions = deletions;
+
+    }
+
+    /**
+     * Merge collection of {@link FileChange}
+     */
+    public static FileChange collapse(Iterable<FileChange> changes) {
+        MutableSet<String> aliases    = Sets.mutable.empty();
+        int                insertions = 0;
+        int                deletions  = 0;
+        for (FileChange change : changes) {
+            aliases = aliases.union(change.aliases);
+            insertions += change.insertions;
+            deletions += change.deletions;
+        }
+        return new FileChange(aliases, insertions, deletions);
     }
 
     /**
@@ -116,8 +149,8 @@ public class FileChange {
     public String toString() {
         MoreObjects.ToStringHelper aliases = MoreObjects.toStringHelper("Diff")
                 .omitNullValues()
-                .addValue(String.format("[%s]", changeType.toString().substring(0, 3)))
-                .add("aliases", Joiner.on(',').join(this.aliases));
+                .add("aliases", Joiner.on(',').join(this.aliases))
+                .addValue(String.format("[%s]", changeType.toString().substring(0, 3)));
 
         if (insertions > 0)
             aliases.add("+", insertions);
