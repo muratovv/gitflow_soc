@@ -23,14 +23,35 @@ import java.util.List;
  */
 public class Analytic {
 
+    /**
+     * Source commits data for analysis
+     */
     private List<Commit> allCommits = new ArrayList<>();
 
-    private ImmutableMap<Author, ImmutableMap<String, CollapsedFileChange>> commits           = null;
-    private ImmutableMap<String, Double>                                    commitCoefficient = null;
-    private ImmutableSet<String>                                            files             = null;
+    /**
+     * Collapsed Commits by author
+     */
+    private ImmutableMap<Author, ImmutableMap<String, CollapsedFileChange>> commits = null;
+
+    /**
+     * TF measure coefficient attached to all files in commits
+     */
+    private ImmutableMap<String, Double> commitCoefficient = null;
+
+    /**
+     * All files changed in source data
+     */
+    private ImmutableSet<String> files = null;
 
     public Analytic(List<Commit> allCommits) {
         this.allCommits = allCommits;
+        inflateStructures();
+    }
+
+    /**
+     * Inflate all structures for compute cosine measure
+     */
+    private void inflateStructures() {
         files = inflateFiles();
         commits = inflateCommits();
         commitCoefficient = inflateCoefficient();
@@ -39,7 +60,7 @@ public class Analytic {
     /**
      * Create a map with {@link CollapsedFileChange}s of all commits of {@link Author}
      */
-    public ImmutableMap<Author, Collection<CollapsedFileChange>> getCollapsedChangedByAuthor() {
+    private ImmutableMap<Author, Collection<CollapsedFileChange>> getCollapsedChangedByAuthor() {
         MutableMap<Author, Collection<CollapsedFileChange>> destMap = Maps.mutable.empty();
         ImmutableListMultimap<Author, Collection<FileChange>> byAuthor = ListsTransforms
                 .convert(allCommits)
@@ -63,6 +84,11 @@ public class Analytic {
     }
 
 
+    /**
+     * Structure is separations by author, where to him attached all changes, by file.
+     *
+     * @return Method inflate structure {@link Author} => {File path => {@link CollapsedFileChange}}
+     */
     private ImmutableMap<Author, ImmutableMap<String, CollapsedFileChange>> inflateCommits() {
         return getCollapsedChangedByAuthor()
                 .collectValues((author, collapsedFileChanges) ->
@@ -72,6 +98,12 @@ public class Analytic {
 
     }
 
+    /**
+     * TF measure {@link Double} - number of all {@link Author}s
+     * divide by number of authors commit to those file
+     *
+     * @return Method inflate structure File_path => TF measure
+     */
     private ImmutableMap<String, Double> inflateCoefficient() {
         int N = commits.size();
         return files.groupByUniqueKey(__ -> __)
@@ -90,6 +122,9 @@ public class Analytic {
         return counter[0];
     }
 
+    /**
+     * @return method inflate set with all files, that changes in source data
+     */
     private ImmutableSet<String> inflateFiles() {
         return ListsTransforms.convert(allCommits)
                 .collect(Commit::changes)
@@ -117,10 +152,17 @@ public class Analytic {
             denominatorA += aWeight * aWeight;
             denominatorB += bWeight * bWeight;
         }
-        return numerator / (Math.sqrt(denominatorA * denominatorB));
+        double denominator = Math.sqrt(denominatorA * denominatorB);
+        if (denominator == 0) return 0.;
+        return numerator / denominator;
     }
 
 
+    /**
+     * Compute impact of {@link Author} based on number of commits, that change those file
+     *
+     * @return weight of author
+     */
     private double weightByCommit(Author author, String file) {
         return commits.get(author).get(file).collapsedCommits() * commitCoefficient.get(file);
     }
