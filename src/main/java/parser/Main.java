@@ -1,9 +1,11 @@
 package parser;
 
-import com.google.common.base.Joiner;
+import analytic.Analytic;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import git.Author;
 import git.Commit;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -25,7 +27,27 @@ public class Main {
         Git git = Git.open(new File(repositoryPath));
         ParserFlow.init(git);
         List<Commit> commits = ParserFlow.getCommits(git);
-        logger.info(Joiner.on('\n').join(commits));
+        //        logger.info(Joiner.on('\n').join(commits));
+
+        Analytic              analytic = new Analytic(commits);
+        ImmutableList<Author> authors  = analytic.getAuthors();
+        logger.info(authors.toString());
+        logger.info("*--------||--------*\n\n");
+
+        for (int i = 0; i < authors.size(); i++) {
+            for (int j = i; j < authors.size(); j++) {
+                Author authorA = authors.get(i);
+                Author authorB = authors.get(j);
+                if (!authorA.equals(authorB)) {
+                    logger.info(String.format(
+                            "Cos(%s, %s) = %s",
+                            authorA.name(), authorB.name(), analytic.cosine(authorA, authorB)));
+                }
+
+            }
+        }
+
+
     }
 
 }
