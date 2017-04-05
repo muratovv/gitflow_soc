@@ -54,9 +54,9 @@ public class GitFlowInfo {
     }
 
     private void parseMessage() {
-        for (String s : prefixes.keySet()) {
-            if (message.contains(s)) {
-                type = prefixes.get(s);
+        for (String prefix : prefixes.keySet()) {
+            if (message.contains(prefix)) {
+                type = prefixes.get(prefix);
                 name = getName();
                 if (name == null) throw new NotFoundGitflowException();
                 return;
@@ -95,7 +95,7 @@ public class GitFlowInfo {
         SUPPORT
     }
 
-    public static class NotFoundGitflowException extends RuntimeException {
+    private static class NotFoundGitflowException extends RuntimeException {
 
     }
 }
