@@ -9,8 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import static util.Require.require;
-
 /**
  * @author @muratovv
  * @date 27.02.17
@@ -74,9 +72,6 @@ public class Differ {
      * @throws IOException
      */
     public List<DiffEntry> makeDiff(RevCommit current, RevCommit prev) throws IOException {
-        require(() -> current.getAuthorIdent().getWhen().after(prev.getAuthorIdent().getWhen()),
-                String.format("Commits must be in strong order: current(%s) <= prev(%s)",
-                        current.getFullMessage(), prev.getFullMessage()));
         List<DiffEntry> scanned = formatter.scan(prev, current);
         return scanned;
     }

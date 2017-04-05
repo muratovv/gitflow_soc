@@ -1,10 +1,7 @@
 package util;
 
-import git.Author;
-import git.Commit;
 import javafx.util.Pair;
 import org.eclipse.collections.api.list.ImmutableList;
-import org.eclipse.collections.api.multimap.list.ImmutableListMultimap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,15 +24,6 @@ public class ListsTransforms {
             res.add(new Pair<>(current, next));
         }
         return res;
-    }
-
-    /**
-     * @param list of {@link Commit}s
-     *
-     * @return mapped pairs (Author => [Commit1, Commit2...]) by author
-     */
-    public static ImmutableListMultimap<Author, Commit> groupByAuthor(ImmutableList<Commit> list) {
-        return list.groupBy((Commit::author));
     }
 
     /**
