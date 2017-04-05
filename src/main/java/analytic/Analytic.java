@@ -188,4 +188,8 @@ public class Analytic {
     public ImmutableSet<String> getFiles() {
         return files;
     }
+
+    public List<Commit> getAllCommits() {
+        return allCommits;
+    }
 }

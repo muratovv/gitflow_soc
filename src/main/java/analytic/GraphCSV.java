@@ -19,7 +19,9 @@ public class GraphCSV {
 
     public String makeCosineCSV() {
         StringBuilder builder = new StringBuilder();
-        builder.append(makeHead());
+        builder
+                .append(generateMetaInformation())
+                .append(makeHead());
         int size = analytic.getAuthors().size();
         for (int i = 0; i < size; i++) {
             for (int j = i + 1; j < size; j++) {
@@ -41,6 +43,15 @@ public class GraphCSV {
 
     private static String makeHead() {
         return String.format("From%s To%s Weight\n", separator, separator);
+    }
+
+    private static String generateComment(Object key, Object value) {
+        return String.format(";%s => %s\n", key, value);
+    }
+
+    private String generateMetaInformation() {
+        return generateComment("authors", analytic.getAuthors().size())
+                + generateComment("commits", analytic.getAllCommits().size());
     }
 
     public void setFilterFuntion(Filter filter) {
