@@ -10,6 +10,7 @@ import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.multimap.list.ImmutableListMultimap;
 import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import util.ListsTransforms;
 
@@ -164,6 +165,27 @@ public class Analytic {
      * @return weight of author
      */
     private double weightByCommit(Author author, String file) {
-        return commits.get(author).get(file).collapsedCommits() * commitCoefficient.get(file);
+        CollapsedFileChange changes = commits.get(author).get(file);
+        if (changes == null) return 0.;
+        return changes.collapsedCommits() * commitCoefficient.get(file);
+    }
+
+    /**
+     * Getter of all authors
+     */
+    public ImmutableList<Author> getAuthors() {
+        return Lists.immutable.ofAll(() -> commits.keysView().iterator());
+    }
+
+    public ImmutableMap<Author, ImmutableMap<String, CollapsedFileChange>> getCommits() {
+        return commits;
+    }
+
+    public ImmutableMap<String, Double> getCommitCoefficient() {
+        return commitCoefficient;
+    }
+
+    public ImmutableSet<String> getFiles() {
+        return files;
     }
 }
