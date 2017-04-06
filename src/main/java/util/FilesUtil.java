@@ -2,6 +2,7 @@ package util;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 
 /**
  * @author @muratovv
@@ -26,5 +27,9 @@ public class FilesUtil {
         } catch (IOException e) {
             return false;
         }
+    }
+
+    public static boolean writeFile(Path path, String data) {
+        return writeFile(path.toString(), data);
     }
 }
