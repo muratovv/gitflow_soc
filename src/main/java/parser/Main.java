@@ -10,6 +10,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import util.FilesUtil;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -25,11 +27,32 @@ public class Main {
         final Config config         = ConfigFactory.load("run.conf");
         String       repositoryPath = config.getString("root.repo_path");
         String       reportPath     = config.getString("root.report_folder");
-        logger.info("Target repo: {}", repositoryPath);
-        repositoryFlow(Paths.get(repositoryPath), Paths.get(reportPath));
+        String       rootRepos      = config.getString("root.root_repos_path");
+        if (rootRepos != null) {
+            allRepositoriesFlow(Paths.get(rootRepos), Paths.get(reportPath, "inside"));
+        } else {
+            repositoryFlow(Paths.get(repositoryPath), Paths.get(reportPath));
+        }
+
     }
 
-    public static void repositoryFlow(Path repoPath, Path reportPath)
+
+    private static void allRepositoriesFlow(Path reposFolder, Path reportPath) throws IOException {
+        DirectoryStream<Path> repos =
+                Files.newDirectoryStream(reposFolder, file -> Files.isDirectory(file));
+        repos.forEach(path -> {
+            try {
+                logger.info("=====||==========||==========||=====\n\n");
+                repositoryFlow(path, reportPath);
+                logger.info("\n\n");
+            } catch (IOException | GitAPIException e) {
+                logger.error("Error on path {}", path);
+                logger.trace("Occurred exception", e);
+            }
+        });
+    }
+
+    private static void repositoryFlow(Path repoPath, Path reportPath)
             throws IOException, GitAPIException {
         String repoName = getRepoName(repoPath);
 
@@ -78,7 +101,7 @@ public class Main {
      * Generate name of report file
      */
     private static String generateReportName(String repoName) {
-        return repoName + ".scv";
+        return repoName + ".csv";
     }
 
 }
