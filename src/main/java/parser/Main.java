@@ -1,16 +1,17 @@
 package parser;
 
 import analytic.Analytic;
+import analytic.GraphCSV;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import git.Author;
 import git.Commit;
-import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import util.FilesUtil;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -23,31 +24,61 @@ public class Main {
     public static void main(String[] args) throws IOException, GitAPIException {
         final Config config         = ConfigFactory.load("run.conf");
         String       repositoryPath = config.getString("root.repo_path");
+        String       reportPath     = config.getString("root.report_folder");
         logger.info("Target repo: {}", repositoryPath);
-        Git git = Git.open(new File(repositoryPath));
+        repositoryFlow(Paths.get(repositoryPath), Paths.get(reportPath));
+    }
+
+    public static void repositoryFlow(Path repoPath, Path reportPath)
+            throws IOException, GitAPIException {
+        String repoName = getRepoName(repoPath);
+
+        List<Commit> commits = retrieveCommits(repoPath, repoName);
+
+        Analytic analytic = computeAnalytic(commits);
+
+        createReport(reportPath, repoName, analytic);
+    }
+
+    private static List<Commit> retrieveCommits(Path repoPath, String repoName)
+            throws IOException, GitAPIException {
+        logger.info("Open repository {}", repoName);
+        Git git = Git.open(repoPath.toFile());
         ParserFlow.init(git);
+        logger.info("Retrieve information...");
         List<Commit> commits = ParserFlow.getCommits(git);
-        //        logger.info(Joiner.on('\n').join(commits));
+        logger.info("Commits retrieved: {}", commits.size());
+        return commits;
+    }
 
-        Analytic              analytic = new Analytic(commits);
-        ImmutableList<Author> authors  = analytic.getAuthors();
-        logger.info(authors.toString());
-        logger.info("*--------||--------*\n\n");
+    private static Analytic computeAnalytic(List<Commit> commits) {
+        logger.info("Construct analytic model...");
+        Analytic analytic = new Analytic(commits);
+        logger.info("Authors in project: {}", analytic.getAuthors().size());
+        return analytic;
+    }
 
-        for (int i = 0; i < authors.size(); i++) {
-            for (int j = i; j < authors.size(); j++) {
-                Author authorA = authors.get(i);
-                Author authorB = authors.get(j);
-                if (!authorA.equals(authorB)) {
-                    logger.info(String.format(
-                            "Cos(%s, %s) = %s",
-                            authorA.name(), authorB.name(), analytic.cosine(authorA, authorB)));
-                }
+    private static void createReport(Path reportPath, String repoName, Analytic analytic) {
+        logger.info("Write graph to csv");
+        GraphCSV graphCSV = new GraphCSV(analytic);
+        boolean written = FilesUtil.writeFile(
+                reportPath.resolve(generateReportName(repoName)),
+                graphCSV.makeCosineCSV());
+        logger.info("Writing in file: {}", written ? "successful" : "failed");
+    }
 
-            }
-        }
+    /**
+     * @return name of repository folder
+     */
+    private static String getRepoName(Path repoPath) {
+        return repoPath.getName(repoPath.getNameCount() - 1).toString();
+    }
 
-
+    /**
+     * Generate name of report file
+     */
+    private static String generateReportName(String repoName) {
+        return repoName + ".scv";
     }
 
 }
