@@ -1,7 +1,7 @@
 package analytic.filtering;
 
 import analytic.graphs.AuthorEdge;
-import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.set.ImmutableSet;
 
 /**
  * @author @muratovv
@@ -9,12 +9,13 @@ import org.eclipse.collections.api.list.ImmutableList;
  */
 public class DefaultEdgeFilter extends AbstractEdgeFilter {
 
-    public DefaultEdgeFilter(ImmutableList<AuthorEdge> edges) {
+    public DefaultEdgeFilter(ImmutableSet<AuthorEdge> edges) {
         super(edges);
     }
 
     @Override
-    public AbstractEdgeFilter filter() {
-        return this;
+    public boolean filter(AuthorEdge edge) {
+        return edge != null;
     }
+
 }

@@ -3,7 +3,7 @@ package analytic.filtering;
 import analytic.graphs.AuthorEdge;
 import analytic.graphs.SilentAuthorGraphRepr;
 import git.Author;
-import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.set.ImmutableSet;
 import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
 import org.jgrapht.alg.spanning.KruskalMinimumSpanningTree;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -12,21 +12,21 @@ import org.jgrapht.graph.SimpleWeightedGraph;
  * @author @muratovv
  * @date 07.04.17
  */
-public class GraphReprFiltering extends AbstractEdgeFilter {
+public class GraphReprFiltering extends DefaultEdgeFilter {
 
 
     private SimpleWeightedGraph<Author, AuthorEdge>        graph        = null;
     private SpanningTreeAlgorithm.SpanningTree<AuthorEdge> spanningTree = null;
 
-    public GraphReprFiltering(ImmutableList<AuthorEdge> sourceEdges) {
-        super(sourceEdges);
+    public GraphReprFiltering(ImmutableSet<AuthorEdge> edges) {
+        super(edges);
         this.graph = makeGraph();
         this.spanningTree = makeSpanningTree();
     }
 
     @Override
-    public AbstractEdgeFilter filter() {
-        return new DefaultEdgeFilter(edges.select(edge -> inSpanningTree(edge)));
+    public boolean filter(AuthorEdge edge) {
+        return super.filter(edge) && inSpanningTree(edge);
     }
 
     private SimpleWeightedGraph<Author, AuthorEdge> makeGraph() {
