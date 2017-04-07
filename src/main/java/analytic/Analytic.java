@@ -1,11 +1,13 @@
 package analytic;
 
 
+import analytic.graphs.AuthorEdge;
 import git.Author;
 import git.CollapsedFileChange;
 import git.Commit;
 import git.FileChange;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.multimap.list.ImmutableListMultimap;
@@ -13,6 +15,7 @@ import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import util.ListsTransforms;
+import util.Require;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,8 +68,8 @@ public class Analytic {
         MutableMap<Author, Collection<CollapsedFileChange>> destMap = Maps.mutable.empty();
         ImmutableListMultimap<Author, Collection<FileChange>> byAuthor =
                 allCommits
-                .groupBy(Commit::author)
-                .collectValues(Commit::changes);
+                        .groupBy(Commit::author)
+                        .collectValues(Commit::changes);
 
         for (Author author : byAuthor.keySet()) {
             ImmutableListMultimap<Collection<String>, FileChange> changes = byAuthor
@@ -168,6 +171,27 @@ public class Analytic {
         CollapsedFileChange changes = commits.get(author).get(file);
         if (changes == null) return 0.;
         return changes.collapsedCommits() * commitCoefficient.get(file);
+    }
+
+    /**
+     * Return all edges based on cosine measure
+     */
+    public ImmutableList<AuthorEdge> getEdges() {
+        MutableList<AuthorEdge> edges = Lists.mutable.empty();
+        int                     size  = getAuthors().size();
+        for (int i = 0; i < size; i++) {
+            for (int j = i + 1; j < size; j++) {
+                Author a             = getAuthors().get(i);
+                Author b             = getAuthors().get(j);
+                double cosineMeasure = cosine(a, b);
+                edges.add(AuthorEdge.make(a, b, cosineMeasure));
+            }
+        }
+        Require.require(() -> {
+            int N = commits.size();
+            return edges.size() == N * (N - 1) / 2;
+        }, "Number of edges must be N*(N-1)/2");
+        return edges.toImmutable();
     }
 
     /**
