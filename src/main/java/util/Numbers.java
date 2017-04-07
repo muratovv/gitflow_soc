@@ -15,7 +15,12 @@ public class Numbers {
      */
     public static boolean le(double left, double right) {
         // TODO 05.04.17 Fix epsilon precision
-        return left < right;
+        return left < right - eps(right);
     }
+
+    private static double eps(double val) {
+        return EPS * (1.0 + Math.abs(val));
+    }
+
 
 }
