@@ -24,13 +24,13 @@ public class GraphCSV {
         builder.append(generateMetaInformation())
                 .append(makeHead());
         analytic.getEdges().forEach(edge -> {
-            String format = generateCSVrow(edge);
+            String format = generateRowOfCSV(edge);
             builder.append(format);
         });
         return builder.toString();
     }
 
-    private static String generateCSVrow(Edge<Author, Double> edge) {
+    private static String generateRowOfCSV(Edge<Author, Double> edge) {
         String doubleInStrRepr = String.format(Locale.GERMAN, "%f", edge.tag());
         return String.format("%s%s %s%s %s\n",
                 generateName(edge.source()), separator, generateName(edge.dest()), separator, doubleInStrRepr);
