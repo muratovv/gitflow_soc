@@ -188,7 +188,7 @@ public class Analytic {
             }
         }
         Require.require(() -> {
-            int N = commits.size();
+            int N = getAuthors().size();
             return edges.size() == N * (N - 1) / 2;
         }, "Number of edges must be N*(N-1)/2");
         return edges.toImmutable();
