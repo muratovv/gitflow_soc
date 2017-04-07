@@ -12,9 +12,13 @@ public class Author {
     private final String name;
     private final String mail;
 
-    public Author(String name, String emailAddress) {
+    private Author(String name, String emailAddress) {
         this.name = name;
         this.mail = emailAddress;
+    }
+
+    public static Author make(String name, String mail) {
+        return new Author(name, mail);
     }
 
     /**
