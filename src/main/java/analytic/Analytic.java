@@ -27,7 +27,7 @@ public class Analytic {
     /**
      * Source commits data for analysis
      */
-    private List<Commit> allCommits = new ArrayList<>();
+    private ImmutableList<Commit> allCommits = null;
 
     /**
      * Collapsed Commits by author
@@ -45,7 +45,7 @@ public class Analytic {
     private ImmutableSet<String> files = null;
 
     public Analytic(List<Commit> allCommits) {
-        this.allCommits = allCommits;
+        this.allCommits = ListsTransforms.convert(allCommits);
         inflateStructures();
     }
 
@@ -63,8 +63,8 @@ public class Analytic {
      */
     private ImmutableMap<Author, Collection<CollapsedFileChange>> getCollapsedChangedByAuthor() {
         MutableMap<Author, Collection<CollapsedFileChange>> destMap = Maps.mutable.empty();
-        ImmutableListMultimap<Author, Collection<FileChange>> byAuthor = ListsTransforms
-                .convert(allCommits)
+        ImmutableListMultimap<Author, Collection<FileChange>> byAuthor =
+                allCommits
                 .groupBy(Commit::author)
                 .collectValues(Commit::changes);
 
@@ -127,7 +127,7 @@ public class Analytic {
      * @return method inflate set with all files, that changes in source data
      */
     private ImmutableSet<String> inflateFiles() {
-        return ListsTransforms.convert(allCommits)
+        return allCommits
                 .collect(Commit::changes)
                 .flatCollect(__ -> __)
                 .collect(FileChange::aliases)
@@ -189,7 +189,7 @@ public class Analytic {
         return files;
     }
 
-    public List<Commit> getAllCommits() {
+    public ImmutableList<Commit> getAllCommits() {
         return allCommits;
     }
 }
