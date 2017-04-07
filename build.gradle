@@ -16,15 +16,27 @@ repositories {
 }
 
 dependencies {
+    // tesing
     testCompile group: 'junit', name: 'junit', version: '4.11'
-    compile group: 'com.google.guava', name: 'guava', version: '21.0'
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '2.2.0.201212191850-r'
+
+    // logging
     compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.6.1'
+
+    // common
+    compile group: 'com.google.guava', name: 'guava', version: '21.0'
+
+    // config
     compile group: 'com.typesafe', name: 'config', version: '1.3.1' // hocon config
+
+    // git
+    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '2.2.0.201212191850-r'
 
     // eclipse collections
     compile 'org.eclipse.collections:eclipse-collections-api:8.1.0'
     compile 'org.eclipse.collections:eclipse-collections:8.1.0'
+
+    // graphs
+    compile group: 'org.jgrapht', name: 'jgrapht-core', version: '1.0.1'
 }
 
 
