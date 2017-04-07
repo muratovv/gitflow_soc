@@ -12,7 +12,6 @@ import java.util.Locale;
  */
 public class GraphCSV {
     private Analytic analytic = null;
-    private Filter   filter   = value -> value > 0;
 
     public static String separator = ";";
 
@@ -53,13 +52,4 @@ public class GraphCSV {
         return generateComment("authors", analytic.getAuthors().size())
                 + generateComment("commits", analytic.getAllCommits().size());
     }
-
-    public void setFilterFuntion(Filter filter) {
-        this.filter = filter;
-    }
-
-    public interface Filter {
-        boolean apply(Double value);
-    }
-
 }
