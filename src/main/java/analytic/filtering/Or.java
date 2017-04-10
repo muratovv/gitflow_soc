@@ -7,8 +7,8 @@ import org.eclipse.collections.api.set.ImmutableSet;
  * @author @muratovv
  * @date 07.04.17
  */
-public class CombinedOr extends CombinedFilter {
-    public CombinedOr(ImmutableSet<AuthorEdge> edges, AbstractEdgeFilter... filters) {
+public class Or extends CombinedFilter {
+    public Or(ImmutableSet<AuthorEdge> edges, AbstractEdgeFilter... filters) {
         super(edges, filters);
     }
 

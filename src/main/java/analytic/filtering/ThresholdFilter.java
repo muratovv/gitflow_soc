@@ -4,16 +4,16 @@ import analytic.graphs.AuthorEdge;
 import org.eclipse.collections.api.set.ImmutableSet;
 
 /**
- * Filter edges by threshold
+ * Filter getInitialGraph by threshold
  *
  * @author @muratovv
  * @date 07.04.17
  */
-public class ThreshloldFilter extends DefaultEdgeFilter {
+public class ThresholdFilter extends DefaultEdgeFilter {
 
     private double threshold = 0;
 
-    public ThreshloldFilter(ImmutableSet<AuthorEdge> edges, double threshold) {
+    public ThresholdFilter(ImmutableSet<AuthorEdge> edges, double threshold) {
         super(edges);
         this.threshold = threshold;
     }

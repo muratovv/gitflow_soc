@@ -2,6 +2,8 @@ package analytic.filtering;
 
 import analytic.graphs.AuthorEdge;
 import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.factory.Sets;
 
 /**
  * @author @muratovv
@@ -14,16 +16,18 @@ public abstract class AbstractEdgeFilter {
         this.edges = edges;
     }
 
-    public final ImmutableSet<AuthorEdge> edges() {
+    public final ImmutableSet<AuthorEdge> getInitialGraph() {
         return edges;
     }
 
-    /**
-     * Create filter with new filtered collection
-     */
-    public AbstractEdgeFilter collect() {
-        return new DefaultEdgeFilter(edges.select(this::filter));
-    }
 
     protected abstract boolean filter(AuthorEdge edge);
+
+    public ImmutableSet<AuthorEdge> apply() {
+        MutableSet<AuthorEdge> filtered = Sets.mutable.empty();
+        for (AuthorEdge edge : edges) {
+            if (filter(edge)) filtered.add(edge);
+        }
+        return filtered.toImmutable();
+    }
 }
