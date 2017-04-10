@@ -48,7 +48,11 @@ public class Analytic {
     private ImmutableSet<String> files = null;
 
     public Analytic(List<Commit> allCommits) {
-        this.allCommits = ListsTransforms.convert(allCommits);
+        this(ListsTransforms.convert(allCommits));
+    }
+
+    public Analytic(ImmutableList<Commit> commits) {
+        this.allCommits = commits;
         inflateStructures();
     }
 
@@ -174,9 +178,9 @@ public class Analytic {
     }
 
     /**
-     * Return all edges based on cosine measure
+     * Return all getInitialGraph based on cosine measure
      */
-    public ImmutableList<AuthorEdge> getEdges() {
+    public ImmutableList<AuthorEdge> getFullGraph() {
         MutableList<AuthorEdge> edges = Lists.mutable.empty();
         int                     size  = getAuthors().size();
         for (int i = 0; i < size; i++) {
@@ -190,7 +194,7 @@ public class Analytic {
         Require.require(() -> {
             int N = getAuthors().size();
             return edges.size() == N * (N - 1) / 2;
-        }, "Number of edges must be N*(N-1)/2");
+        }, "Number of getInitialGraph must be N*(N-1)/2");
         return edges.toImmutable();
     }
 
