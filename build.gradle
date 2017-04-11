@@ -13,7 +13,6 @@ mainClassName = "parser.Main"
 
 repositories {
     jcenter()
-    maven { url 'https://maven.fabric.io/public' }
 }
 
 dependencies {
