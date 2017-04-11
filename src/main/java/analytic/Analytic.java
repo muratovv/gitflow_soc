@@ -180,7 +180,7 @@ public class Analytic {
     /**
      * Return all getInitialGraph based on cosine measure
      */
-    public ImmutableList<AuthorEdge> getFullGraph() {
+    public ImmutableSet<AuthorEdge> getFullGraph() {
         MutableList<AuthorEdge> edges = Lists.mutable.empty();
         int                     size  = getAuthors().size();
         for (int i = 0; i < size; i++) {
@@ -195,7 +195,7 @@ public class Analytic {
             int N = getAuthors().size();
             return edges.size() == N * (N - 1) / 2;
         }, "Number of getInitialGraph must be N*(N-1)/2");
-        return edges.toImmutable();
+        return edges.toSet().toImmutable();
     }
 
     /**
