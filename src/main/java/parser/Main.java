@@ -62,18 +62,24 @@ public class Main {
 
 
         logger.info("Construct analytic model...");
-        Analytic                 analytic    = computeAnalytic(commits);
-        ImmutableSet<AuthorEdge> authorEdges = analytic.getFullGraph().toSet().toImmutable();
-        DefaultEdgeFilter        baseline    = new DefaultEdgeFilter(authorEdges);
-        AbstractEdgeFilter spanningAndThreshold = new Or(authorEdges,
-                new SpanningTreeFilter(authorEdges), new ThresholdFilter(authorEdges, 0.5));
-        logger.info("Edges - baseline {} vs improved {}", baseline.apply().size(),
-                spanningAndThreshold.apply().size());
+        Analytic                 analytic = computeAnalytic(commits);
+        ImmutableSet<AuthorEdge> graph    = analytic.getFullGraph();
 
+        ImmutableSet<AuthorEdge> baseline = applyFilter(new DefaultEdgeFilter(graph));
+        ImmutableSet<AuthorEdge> spanningTree = applyFilter(new Or(graph,
+                new SpanningTreeFilter(graph), new ThresholdFilter(graph, 0.5)));
+        ImmutableSet<AuthorEdge> autoThreshold = applyFilter(new Or(graph,
+                new SpanningTreeFilter(graph), new TopWeightedFilter(graph)));
+        logger.info(String.format("Edges - baseline %s vs spanning tree %s vs auto %s", baseline.size(),
+                spanningTree.size(), autoThreshold.size()));
 
-        createReport(reportPath, repoName + "-baseline", baseline.apply());
-        createReport(reportPath, repoName + "-spanningAndThreshold",
-                spanningAndThreshold.apply());
+        createReport(reportPath, repoName + "-baseline", baseline);
+        createReport(reportPath, repoName + "-spanningTree", spanningTree);
+        createReport(reportPath, repoName + "-autoDetection", autoThreshold);
+    }
+
+    private static ImmutableSet<AuthorEdge> applyFilter(AbstractEdgeFilter filter) {
+        return filter.apply();
     }
 
     private static List<Commit> retrieveCommits(Path repoPath, String repoName)
