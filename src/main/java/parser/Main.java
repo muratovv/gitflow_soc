@@ -1,10 +1,13 @@
 package parser;
 
 import analytic.Analytic;
-import analytic.GraphCSV;
+import analytic.GraphReportCSV;
+import analytic.filtering.*;
+import analytic.graphs.AuthorEdge;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import git.Commit;
+import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import util.FilesUtil;
@@ -33,7 +36,6 @@ public class Main {
         } else {
             repositoryFlow(Paths.get(repositoryPath), Paths.get(reportPath));
         }
-
     }
 
 
@@ -58,9 +60,20 @@ public class Main {
 
         List<Commit> commits = retrieveCommits(repoPath, repoName);
 
-        Analytic analytic = computeAnalytic(commits);
 
-        createReport(reportPath, repoName, analytic);
+        logger.info("Construct analytic model...");
+        Analytic                 analytic    = computeAnalytic(commits);
+        ImmutableSet<AuthorEdge> authorEdges = analytic.getFullGraph().toSet().toImmutable();
+        DefaultEdgeFilter        baseline    = new DefaultEdgeFilter(authorEdges);
+        AbstractEdgeFilter spanningAndThreshold = new Or(authorEdges,
+                new SpanningTreeFilter(authorEdges), new ThresholdFilter(authorEdges, 0.5));
+        logger.info("Edges - baseline {} vs improved {}", baseline.apply().size(),
+                spanningAndThreshold.apply().size());
+
+
+        createReport(reportPath, repoName + "-baseline", baseline.apply());
+        createReport(reportPath, repoName + "-spanningAndThreshold",
+                spanningAndThreshold.apply());
     }
 
     private static List<Commit> retrieveCommits(Path repoPath, String repoName)
@@ -81,12 +94,12 @@ public class Main {
         return analytic;
     }
 
-    private static void createReport(Path reportPath, String repoName, Analytic analytic) {
+    private static void createReport(Path reportPath, String repoName, ImmutableSet<AuthorEdge> graph) {
         logger.info("Write graph to csv");
-        GraphCSV graphCSV = new GraphCSV(analytic);
+        GraphReportCSV graphReportCSV = new GraphReportCSV(graph);
         boolean written = FilesUtil.writeFile(
                 reportPath.resolve(generateReportName(repoName)),
-                graphCSV.makeCosineCSV());
+                graphReportCSV.makeCosineBlobCSV());
         logger.info("Writing in file: {}", written ? "successful" : "failed");
     }
 

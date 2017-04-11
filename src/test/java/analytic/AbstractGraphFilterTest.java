@@ -1,6 +1,6 @@
 package analytic;
 
-import analytic.filtering.GraphReprFiltering;
+import analytic.filtering.SpanningTreeFilter;
 import analytic.graphs.AuthorEdge;
 import analytic.graphs.Edge;
 import git.Author;
@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
  * @author @muratovv
  * @date 07.04.17
  */
-public class GraphReprFilteringTest {
+public class AbstractGraphFilterTest {
     @Test
     public void spanningTreeTest() throws Exception {
         Author                    V1     = Author.make("a", "a");
@@ -27,7 +27,7 @@ public class GraphReprFilteringTest {
         AuthorEdge                E34    = make(V3, V4, 3.);
         AuthorEdge                E41    = make(V1, V4, 4.);
         ImmutableList<AuthorEdge> edges  = Lists.immutable.of(E12, E23, E34, E41);
-        GraphReprFiltering        filter = new GraphReprFiltering(edges);
+        SpanningTreeFilter        filter = new SpanningTreeFilter(edges.toSet().toImmutable());
 
 
         assertFalse(filter.inSpanningTree(E41));
@@ -38,7 +38,7 @@ public class GraphReprFilteringTest {
         assertTrue(filter.inSpanningTree(E23));
         assertTrue(filter.inSpanningTree(E34));
 
-        assertEquals(3, filter.filter().edges().size());
+        assertEquals(3, filter.apply().size());
 
 
     }
