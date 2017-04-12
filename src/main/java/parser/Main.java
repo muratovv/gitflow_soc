@@ -7,10 +7,12 @@ import analytic.graphs.AuthorEdge;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import git.Commit;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import util.FilesUtil;
+import util.ListsTransforms;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -58,18 +60,23 @@ public class Main {
             throws IOException, GitAPIException {
         String repoName = getRepoName(repoPath);
 
-        List<Commit> commits = retrieveCommits(repoPath, repoName);
 
+        ImmutableList<Commit> immutableCommits = ListsTransforms
+                .convert(retrieveCommits(repoPath, repoName));
 
-        logger.info("Construct analytic model...");
-        Analytic                 analytic = computeAnalytic(commits);
-        ImmutableSet<AuthorEdge> graph    = analytic.getFullGraph();
+        commitsFlow(immutableCommits, repoName, reportPath.resolve("normal"));
+        commitsFlow(immutableCommits.select(commit -> commit.info() != null), repoName, reportPath.resolve("gitflow"));
+    }
 
-        ImmutableSet<AuthorEdge> baseline = applyFilter(new DefaultEdgeFilter(graph));
-        ImmutableSet<AuthorEdge> spanningTree = applyFilter(new Or(graph,
-                new SpanningTreeFilter(graph), new ThresholdFilter(graph, 0.5)));
-        ImmutableSet<AuthorEdge> autoThreshold = applyFilter(new Or(graph,
-                new SpanningTreeFilter(graph), new TopWeightedFilter(graph)));
+    private static void commitsFlow(ImmutableList<Commit> commits, String repoName, Path reportPath) {
+        logger.info("Commits for work {}", commits.size());
+        Analytic analytic = computeAnalytic(commits);
+        ImmutableSet<AuthorEdge> graph = applyFilter(new ThresholdFilter(analytic.getFullGraph(),
+                0));
+
+        ImmutableSet<AuthorEdge> baseline      = applyFilter(new DefaultEdgeFilter(graph));
+        ImmutableSet<AuthorEdge> spanningTree  = applyFilter(spanninTreeFilter(graph));
+        ImmutableSet<AuthorEdge> autoThreshold = applyFilter(autoDetectionFilter(graph));
         logger.info(String.format("Edges - baseline %s vs spanning tree %s vs auto %s", baseline.size(),
                 spanningTree.size(), autoThreshold.size()));
 
@@ -88,12 +95,10 @@ public class Main {
         Git git = Git.open(repoPath.toFile());
         ParserFlow.init(git);
         logger.info("Retrieve information...");
-        List<Commit> commits = ParserFlow.getCommits(git);
-        logger.info("Commits retrieved: {}", commits.size());
-        return commits;
+        return ParserFlow.getCommits(git);
     }
 
-    private static Analytic computeAnalytic(List<Commit> commits) {
+    private static Analytic computeAnalytic(ImmutableList<Commit> commits) {
         logger.info("Construct analytic model...");
         Analytic analytic = new Analytic(commits);
         logger.info("Authors in project: {}", analytic.getAuthors().size());
@@ -101,12 +106,11 @@ public class Main {
     }
 
     private static void createReport(Path reportPath, String repoName, ImmutableSet<AuthorEdge> graph) {
-        logger.info("Write graph to csv");
         GraphReportCSV graphReportCSV = new GraphReportCSV(graph);
         boolean written = FilesUtil.writeFile(
                 reportPath.resolve(generateReportName(repoName)),
                 graphReportCSV.makeCosineBlobCSV());
-        logger.info("Writing in file: {}", written ? "successful" : "failed");
+        logger.info("Writing in {}: {}", repoName, written ? "successful" : "failed");
     }
 
     /**
@@ -123,4 +127,11 @@ public class Main {
         return repoName + ".csv";
     }
 
+    private static AbstractEdgeFilter spanninTreeFilter(ImmutableSet<AuthorEdge> graph) {
+        return new SpanningTreeFilter(graph);
+    }
+
+    private static AbstractEdgeFilter autoDetectionFilter(ImmutableSet<AuthorEdge> graph) {
+        return new Or(graph, new SpanningTreeFilter(graph), new TopWeightedFilter(graph));
+    }
 }
