@@ -13,6 +13,7 @@ mainClassName = "parser.Main"
 
 repositories {
     jcenter()
+    mavenLocal()
 }
 
 dependencies {
@@ -39,6 +40,11 @@ dependencies {
     compile group: 'org.jgrapht', name: 'jgrapht-core', version: '1.0.1'
 }
 
+idea {
+    module {
+        downloadSources = true
+    }
+}
 
 
 buildscript {
