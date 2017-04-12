@@ -24,7 +24,7 @@ public class TopWeightedFilter extends AbstractGraphFilter {
     }
 
     public TopWeightedFilter(ImmutableSet<AuthorEdge> edges) {
-        this(edges, 3.0);
+        this(edges, 1);
     }
 
     public void setRatioEdgesToNode(double ratioEdgesToNode) {
@@ -51,6 +51,6 @@ public class TopWeightedFilter extends AbstractGraphFilter {
     }
 
     private ImmutableList<AuthorEdge> makeSortedListOfEdges() {
-        return edges.toSortedList(Comparator.comparingDouble(Edge::tag)).toImmutable();
+        return edges.toSortedList(Comparator.comparingDouble(Edge::tag)).reverseThis().toImmutable();
     }
 }
