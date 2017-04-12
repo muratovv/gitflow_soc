@@ -14,6 +14,11 @@ public class AuthorEdge extends Edge<Author, Double> {
         super(source, dest, tag);
     }
 
+    @Override
+    protected double getWeight() {
+        return tag();
+    }
+
     public static AuthorEdge make(Author source, Author dest, Double tag) {
         return new AuthorEdge(source, dest, tag);
     }
