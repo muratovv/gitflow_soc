@@ -74,7 +74,6 @@ public class Analytic {
                 allCommits
                         .groupBy(Commit::author)
                         .collectValues(Commit::changes);
-
         for (Author author : byAuthor.keySet()) {
             ImmutableListMultimap<Collection<String>, FileChange> changes = byAuthor
                     .get(author)
@@ -102,7 +101,8 @@ public class Analytic {
                 .collectValues((author, collapsedFileChanges) ->
                         ListsTransforms.convert(new ArrayList<>(collapsedFileChanges))
                                 .groupByUniqueKey(change ->
-                                        change.aliases().iterator().next())); // TODO care about only one alias
+                                        // TODO care about only one alias
+                                        change.aliases().iterator().next()));
 
     }
 
@@ -202,7 +202,7 @@ public class Analytic {
      * Getter of all authors
      */
     public ImmutableList<Author> getAuthors() {
-        return Lists.immutable.ofAll(() -> commits.keysView().iterator());
+        return Lists.immutable.ofAll(() -> commits.toMap().keySet().iterator());
     }
 
     public ImmutableMap<Author, ImmutableMap<String, CollapsedFileChange>> getCommits() {
