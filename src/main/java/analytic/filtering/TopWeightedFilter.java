@@ -17,8 +17,8 @@ public class TopWeightedFilter extends AbstractGraphFilter {
     private ThresholdFilter           thresholdFilter  = null;
     private ImmutableList<AuthorEdge> sortedEdges      = null;
 
-    public TopWeightedFilter(ImmutableSet<AuthorEdge> graph, double ratioEdgesToNode) {
-        super(graph);
+    public TopWeightedFilter(ImmutableSet<AuthorEdge> edges, double ratioEdgesToNode) {
+        super(edges);
         sortedEdges = makeSortedListOfEdges();
         setRatioEdgesToNode(ratioEdgesToNode);
     }
